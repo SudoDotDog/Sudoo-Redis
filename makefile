@@ -65,6 +65,8 @@ publish: install tests license build
 	@echo "[INFO] Publishing package"
 	@cd app && npm publish --access=public
 
+stop: stop-cli stop-redis
+
 stop-redis:
 	@echo "[INFO] Terminate Redis"
 	@docker kill $(redis_master_tag)
