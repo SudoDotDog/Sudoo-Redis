@@ -9,7 +9,10 @@ mocha := node_modules/.bin/mocha
 
 redis_master_tag := sudoo-redis-master
 redis_slave_tag := sudoo-redis-slave
-redis_cli_tag := sudoo-redis-cli
+redis_master_cli_tag := sudoo-redis-cli-master
+redis_slave_cli_tag := sudoo-redis-cli-slave
+
+redis_network := sudoo-redis-network
 
 .IGNORE: clean-linux stop-redis stop-cli
 
@@ -68,17 +71,25 @@ stop-redis:
 	@docker kill $(redis_slave_tag)
 	@docker rm $(redis_master_tag)
 	@docker rm $(redis_slave_tag)
+	@docker network rm $(redis_network)
 
 redis: stop-redis
 	@echo "[INFO] Running redis with Docker"
-	@docker run -dit -p 6379:6379 --name $(redis_master_tag) redis:latest
-	@docker run -dit -p 6380:6380 --name $(redis_slave_tag) redis:latest /bin/sh -c redis-server --slaveof localhost 6379
+	@docker network create $(redis_network)
+	@docker run -dit --name $(redis_master_tag) --network $(redis_network) --network-alias $(redis_master_tag) redis:latest
+	@docker run -dit --name $(redis_slave_tag) --network $(redis_network) --network-alias $(redis_slave_tag) redis:latest /bin/sh -c "redis-server --slaveof $(redis_master_tag) 6379"
 
 stop-cli:
 	@echo "[INFO] Terminate Cli"
-	@docker kill $(redis_cli_tag)
-	@docker rm $(redis_cli_tag)
+	@docker kill $(redis_master_cli_tag)
+	@docker kill $(redis_slave_cli_tag)
+	@docker rm $(redis_master_cli_tag)
+	@docker rm $(redis_slave_cli_tag)
 
-cli: stop-cli
-	@echo "[INFO] Running redis CLI"
-	@docker run -it --name $(redis_cli_tag) redis:latest /bin/sh
+slave:
+	@echo "[INFO] Running redis CLI Master"
+	@docker run -it --name $(redis_master_cli_tag) --network $(redis_network) redis:latest /bin/sh -c "redis-cli -h $(redis_slave_tag) -p 6379"
+
+master: 
+	@echo "[INFO] Running redis CLI Slave"
+	@docker run -it --name $(redis_slave_cli_tag) --network $(redis_network) redis:latest /bin/sh -c "redis-cli -h $(redis_master_tag) -p 6379"
