@@ -5,6 +5,9 @@ node_js:
   - "11"
   - "12"
 
+services:
+  - redis-server
+
 cache: npm
 
 install:
