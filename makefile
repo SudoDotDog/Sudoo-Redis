@@ -9,6 +9,7 @@ mocha := node_modules/.bin/mocha
 
 redis_master_tag := sudoo-redis-master
 redis_slave_tag := sudoo-redis-slave
+redis_sentinel_tag := sudoo-redis-sentinel
 redis_master_cli_tag := sudoo-redis-cli-master
 redis_slave_cli_tag := sudoo-redis-cli-slave
 
@@ -71,15 +72,21 @@ stop-redis:
 	@echo "[INFO] Terminate Redis"
 	@docker kill $(redis_master_tag)
 	@docker kill $(redis_slave_tag)
+	@docker kill $(redis_sentinel_tag)
 	@docker rm $(redis_master_tag)
 	@docker rm $(redis_slave_tag)
+	@docker rm $(redis_sentinel_tag)
 	@docker network rm $(redis_network)
 
 redis: stop-redis
 	@echo "[INFO] Running redis with Docker"
 	@docker network create $(redis_network)
 	@docker run -dit --name $(redis_master_tag) --network $(redis_network) --network-alias $(redis_master_tag) redis:latest
-	@docker run -dit --name $(redis_slave_tag) --network $(redis_network) --network-alias $(redis_slave_tag) redis:latest /bin/sh -c "redis-server --slaveof $(redis_master_tag) 6379"
+	@docker run -dit --name $(redis_slave_tag) --network $(redis_network) --network-alias $(redis_slave_tag) redis:latest \
+	/bin/sh -c "redis-server --slaveof $(redis_master_tag) 6379"
+	@docker run -dit --name $(redis_sentinel_tag) --network $(redis_network) --network-alias $(redis_sentinel_tag) \
+	-v $(shell pwd)/cluster/sentinel.conf:/redis/sentinel.conf redis:latest \
+	/bin/sh -c "redis-sentinel /redis/sentinel.conf"
 
 stop-cli:
 	@echo "[INFO] Terminate Cli"
