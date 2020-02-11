@@ -15,13 +15,18 @@
     "url": "https://github.com/SudoDotDog/Sudoo-Redis/issues"
   },
   "homepage": "https://github.com/SudoDotDog/Sudoo-Redis#readme",
-  "dependencies": {
-    "ioredis": "^4.14.1"
-  },
+  "dependencies": {},
   "devDependencies": {
     "@sudoo/io": "^1.6.2",
     "@sudoo/triforce": "^2.1.0",
-    "@types/ioredis": "^4.14.7"
+    "@types/ioredis": "^4.14.7",
+    "ioredis": "^4.14.1"
+  },
+  "peerDependencies": {
+    "ioredis": "*"
+  },
+  "optionalDependencies": {
+    "@types/ioredis": "*"
   },
   "nyc": {
     "extension": [
