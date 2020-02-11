@@ -7,6 +7,8 @@ tsc := node_modules/.bin/tsc
 ts_node := node_modules/.bin/ts-node
 mocha := node_modules/.bin/mocha
 
+example_tag := suduoo-redis-example
+
 redis_master_tag := sudoo-redis-master
 redis_slave_tag := sudoo-redis-slave
 redis_sentinel_tag := sudoo-redis-sentinel
@@ -23,7 +25,7 @@ dev:
 	@echo "[INFO] Building for development"
 	@NODE_ENV=development $(tsc) --p $(dev)
 
-example: dev
+example:
 	@echo "[INFO] Running example"
 	@NODE_ENV=development $(ts_node) example/cluster.ts
 
@@ -66,7 +68,18 @@ publish: install tests license build
 	@echo "[INFO] Publishing package"
 	@cd app && npm publish --access=public
 
-stop: stop-cli stop-redis
+stop: stop-cli stop-example stop-redis
+
+stop-example:
+	@echo "[INFO] Terminate Example"
+	@docker kill $(example_tag)
+	@docker rm $(example_tag)
+
+host: dev
+	@echo "[INFO] Running example"
+	@docker run -it --name $(example_tag) --network $(redis_network) \
+	-v $(shell pwd):/app mhart/alpine-node:12 \
+	/bin/sh
 
 stop-redis:
 	@echo "[INFO] Terminate Redis"
@@ -80,13 +93,24 @@ stop-redis:
 
 redis: stop-redis
 	@echo "[INFO] Running redis with Docker"
-	@docker network create $(redis_network)
-	@docker run -dit --name $(redis_master_tag) --network $(redis_network) --network-alias $(redis_master_tag) redis:latest
-	@docker run -dit --name $(redis_slave_tag) --network $(redis_network) --network-alias $(redis_slave_tag) redis:latest \
+	# @docker network create $(redis_network)
+	@docker run -dit --name $(redis_master_tag) --network $(redis_network) --network-alias $(redis_master_tag) \
+	redis:latest
+	@docker run -dit --name $(redis_slave_tag) --network $(redis_network) --network-alias $(redis_slave_tag) \
+	redis:latest \
 	/bin/sh -c "redis-server --slaveof $(redis_master_tag) 6379"
 	@docker run -dit --name $(redis_sentinel_tag) --network $(redis_network) --network-alias $(redis_sentinel_tag) \
 	-v $(shell pwd)/cluster/sentinel.conf:/redis/sentinel.conf redis:latest \
 	/bin/sh -c "redis-sentinel /redis/sentinel.conf"
+
+redis-master:
+	@docker run -dit --name $(redis_master_tag) --network $(redis_network) --network-alias $(redis_master_tag) \
+	redis:latest
+
+redis-slave:
+	@docker run -dit --name $(redis_slave_tag) --network $(redis_network) --network-alias $(redis_slave_tag) \
+	redis:latest \
+	/bin/sh -c "redis-server --slaveof $(redis_master_tag) 6379"
 
 stop-cli:
 	@echo "[INFO] Terminate Cli"
@@ -95,10 +119,10 @@ stop-cli:
 	@docker rm $(redis_master_cli_tag)
 	@docker rm $(redis_slave_cli_tag)
 
-slave:
+master:
 	@echo "[INFO] Running redis CLI Master"
-	@docker run -it --name $(redis_master_cli_tag) --network $(redis_network) redis:latest /bin/sh -c "redis-cli -h $(redis_slave_tag) -p 6379"
+	@docker run -it --name $(redis_master_cli_tag) --network $(redis_network) redis:latest /bin/sh -c "redis-cli -h $(redis_master_tag) -p 6379"
 
-master: 
+slave: 
 	@echo "[INFO] Running redis CLI Slave"
-	@docker run -it --name $(redis_slave_cli_tag) --network $(redis_network) redis:latest /bin/sh -c "redis-cli -h $(redis_master_tag) -p 6379"
+	@docker run -it --name $(redis_slave_cli_tag) --network $(redis_network) redis:latest /bin/sh -c "redis-cli -h $(redis_slave_tag) -p 6379"

@@ -4,12 +4,17 @@
  * @description Cluster
  */
 
-import { RedisManager } from "../src/manager";
+import * as IORedis from "ioredis";
 
-const manager: RedisManager = RedisManager.fromNodes({
-    port: 6379,
-    host: 'localhost',
-}, {
-    port: 3280,
-    host: 'localhost',
+const redis = new IORedis({
+    maxRetriesPerRequest: 100,
+    sentinels: [
+        { host: "sudoo-redis-sentinel", port: 26379 },
+    ],
+    name: "mymaster",
 });
+let i = 0;
+setInterval(() => {
+    redis.set(i++ + '', "bar");
+}, 1000);
+
