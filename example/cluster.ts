@@ -5,11 +5,17 @@
  */
 
 import { RedisManager } from "../src/manager";
+import * as IORedis from "ioredis";
 
-const manager: RedisManager = RedisManager.fromNodes({
+const a = new IORedis({
     port: 6379,
     host: 'localhost',
-}, {
-    port: 3280,
-    host: 'localhost',
 });
+
+// const manager: RedisManager = RedisManager.fromNodes({
+//     port: 6379,
+//     host: 'localhost',
+// }, {
+//     port: 3280,
+//     host: 'localhost',
+// });
