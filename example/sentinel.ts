@@ -1,9 +1,10 @@
 /**
  * @author WMXPY
  * @namespace Example
- * @description Cluster
+ * @description Sentinel
  */
 
+import { TIME_IN_MILLISECONDS } from "@sudoo/magic";
 import * as IORedis from "ioredis";
 
 const redis = new IORedis({
@@ -11,10 +12,11 @@ const redis = new IORedis({
     sentinels: [
         { host: "sudoo-redis-sentinel", port: 26379 },
     ],
-    name: "mymaster",
+    name: "my-master",
 });
 let i = 0;
 setInterval(() => {
-    redis.set(i++ + '', "bar");
-}, 1000);
+    const newValue: number = ++i;
+    redis.set(newValue.toString(), newValue);
+}, TIME_IN_MILLISECONDS.SECOND);
 

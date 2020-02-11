@@ -18,6 +18,7 @@
   "dependencies": {},
   "devDependencies": {
     "@sudoo/io": "^1.6.2",
+    "@sudoo/magic": "^1.4.3",
     "@sudoo/triforce": "^2.1.0",
     "@types/ioredis": "^4.14.7",
     "ioredis": "^4.14.1"
