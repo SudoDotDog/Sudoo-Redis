@@ -17,7 +17,9 @@ redis_slave_cli_tag := sudoo-redis-cli-slave
 
 redis_network := sudoo-redis-network
 
-.IGNORE: clean-linux stop-redis stop-cli stop-example
+redis_singler := sudoo-redis-singler
+
+.IGNORE: clean-linux stop-redis stop-cli stop-example stop-singler
 
 main: dev
 
@@ -68,7 +70,7 @@ publish: install tests license build
 	@echo "[INFO] Publishing package"
 	@cd app && npm publish --access=public
 
-stop: stop-cli stop-example stop-redis
+stop: stop-cli stop-example stop-redis stop-singler
 
 stop-example:
 	@echo "[INFO] Terminate Example"
@@ -126,3 +128,12 @@ master:
 slave: 
 	@echo "[INFO] Running redis CLI Slave"
 	@docker run -it --name $(redis_slave_cli_tag) --network $(redis_network) redis:latest /bin/sh -c "redis-cli -h $(redis_slave_tag) -p 6379"
+
+stop-singler:
+	@echo "[INFO] Terminate Redis"
+	@docker kill $(redis_singler)
+	@docker rm $(redis_singler)
+
+singler: 
+	@echo "[INFO] Starting Redis Singler"
+	@docker run -it -p 6379:6379 --name $(redis_singler) redis:latest
