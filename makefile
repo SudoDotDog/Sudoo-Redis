@@ -27,9 +27,9 @@ dev:
 	@echo "[INFO] Building for development"
 	@NODE_ENV=development $(tsc) --p $(dev)
 
-example:
-	@echo "[INFO] Running example"
-	@NODE_ENV=development $(ts_node) example/cluster.ts
+file:
+	@echo "[INFO] Running Example File"
+	@NODE_ENV=development $(ts_node) example/$(FILE).ts
 
 build:
 	@echo "[INFO] Building for production"
