@@ -17,7 +17,7 @@ redis_slave_cli_tag := sudoo-redis-cli-slave
 
 redis_network := sudoo-redis-network
 
-.IGNORE: clean-linux stop-redis stop-cli
+.IGNORE: clean-linux stop-redis stop-cli stop-example
 
 main: dev
 
