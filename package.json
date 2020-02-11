@@ -1,0 +1,41 @@
+{
+  "name": "@sudoo/redis",
+  "version": "1.0.1",
+  "description": ":chestnut: Redis for Node",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SudoDotDog/Sudoo-Redis.git"
+  },
+  "keywords": [
+    "Redis"
+  ],
+  "author": "WMXPY",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/SudoDotDog/Sudoo-Redis/issues"
+  },
+  "homepage": "https://github.com/SudoDotDog/Sudoo-Redis#readme",
+  "dependencies": {},
+  "devDependencies": {
+    "@sudoo/io": "^1.6.2",
+    "@sudoo/triforce": "^2.1.0"
+  },
+  "nyc": {
+    "extension": [
+      ".ts"
+    ],
+    "include": [
+      "src/**/*.ts"
+    ],
+    "instrument": true,
+    "reporter": [
+      "json",
+      "text-summary"
+    ],
+    "report-dir": "coverage",
+    "require": [
+      "./test/tshook.js"
+    ],
+    "sourceMap": true
+  }
+}
