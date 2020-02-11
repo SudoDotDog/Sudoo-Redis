@@ -93,7 +93,7 @@ stop-redis:
 
 redis: stop-redis
 	@echo "[INFO] Running redis with Docker"
-	# @docker network create $(redis_network)
+	@docker network create $(redis_network)
 	@docker run -dit --name $(redis_master_tag) --network $(redis_network) --network-alias $(redis_master_tag) \
 	redis:latest
 	@docker run -dit --name $(redis_slave_tag) --network $(redis_network) --network-alias $(redis_slave_tag) \
