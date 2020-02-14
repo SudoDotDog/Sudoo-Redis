@@ -14,6 +14,6 @@ describe('Given a {Redis} Class', (): void => {
 
     it('should be able', (): void => {
 
-        expect(1).to.be.instanceOf(1);
+        expect(1).to.be.equal(1);
     });
 });
