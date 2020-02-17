@@ -134,6 +134,6 @@ stop-singler:
 	@docker kill $(redis_singler)
 	@docker rm $(redis_singler)
 
-singler: 
+singler: stop-singler
 	@echo "[INFO] Starting Redis Singler"
 	@docker run -it -p 6379:6379 --name $(redis_singler) redis:latest
